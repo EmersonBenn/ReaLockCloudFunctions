@@ -28,7 +28,8 @@ exports.newPasskey = functions.database.ref('/Lockbox1/timesOpened')
 				const salt = dataSnapshot.val();// handle read data.
 				//return salt;
 				console.log('Hashing', event.params.pushId, oldKey);
-				hash.update(parseInt(oldKey.concat(salt),16);
+				const buf1 = new Buffer.from(oldKey.concat(salt), 'hex');
+				hash.update(buf1);
 				return event.data.ref.parent.child('passkey').set(hash.digest('hex'));
 				
 			});
