@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
 const crypto = require('crypto');
-const hash = crypto.createHash('sha256');
+
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -18,6 +18,7 @@ exports.newPasskey = functions.database.ref('/Lockbox1/timesOpened')
     .onWrite(event => {
       // Grab the current value of what was written to the Realtime Database.
       const oldKeyRef = event.data.adminRef.parent.child('passkey');
+	  const hash = crypto.createHash('sha256');
 	  oldKeyRef.once('value')
 		.then(function(dataSnapshot) {
 			const oldKey = dataSnapshot.val();// handle read data.
@@ -30,7 +31,7 @@ exports.newPasskey = functions.database.ref('/Lockbox1/timesOpened')
 				console.log('Hashing', event.params.pushId, oldKey);
 				const buf1 = new Buffer.from(oldKey.concat(salt), 'hex');
 				hash.update(buf1);
-				return event.data.ref.parent.child('passkey').set(hash.digest('hex'));
+				return event.data.ref.parent.child('passkey').set(hash.digest('hex').substring(0, 32));
 				
 			});
 	    });
